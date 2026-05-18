@@ -3,12 +3,14 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import App from './App'
+import { PWAInstallBanner } from './components/ui/PWAInstallBanner'
 import '@/styles/globals.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <App />
+      <PWAInstallBanner />
       <Toaster
         position="bottom-right"
         toastOptions={{
@@ -22,15 +24,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
             fontFamily: "'DM Sans', sans-serif",
             boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
           },
-          success: {
-            iconTheme: { primary: '#10B981', secondary: '#14141E' },
-          },
-          error: {
-            iconTheme: { primary: '#EF4444', secondary: '#14141E' },
-          },
-          loading: {
-            iconTheme: { primary: '#7C3AED', secondary: '#14141E' },
-          },
+          success: { iconTheme: { primary: '#10B981', secondary: '#14141E' } },
+          error:   { iconTheme: { primary: '#EF4444', secondary: '#14141E' } },
         }}
       />
     </BrowserRouter>

@@ -2,8 +2,8 @@ import { useRef, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { PageShell } from '@/components/layout/PageShell'
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card'
-import { useTasks, useHabits, useSubjects } from '@/store/useAppStore'
-import { STUDY_DATA } from '@/constants/data'
+import { Button } from '@/components/ui/Button'
+import { useTasks, useHabits, useSubjects, useAppStore } from '@/store/useAppStore'
 
 function BarChart({ data }: { data: { day: string; h: number }[] }) {
   const max = Math.max(...data.map(d => d.h), 1)
@@ -12,16 +12,12 @@ function BarChart({ data }: { data: { day: string; h: number }[] }) {
       {data.map((d, i) => (
         <div key={i} className="flex-1 flex flex-col items-center gap-1">
           <div className="flex-1 w-full flex items-end">
-            <motion.div
-              initial={{ height: 0 }} animate={{ height: `${(d.h / max) * 90}%` }}
+            <motion.div initial={{ height: 0 }} animate={{ height: `${(d.h / max) * 90}%` }}
               transition={{ delay: i * 0.06, duration: 0.5 }}
               className="w-full rounded-t-sm" style={{
                 minHeight: 4,
-                background: i === data.length - 1
-                  ? 'linear-gradient(to top,#7C3AED,#06B6D4)'
-                  : `rgba(124,58,237,${0.2 + (i / data.length) * 0.5})`,
-              }}
-            />
+                background: `rgba(124,58,237,${0.3 + (i / data.length) * 0.6})`,
+              }} />
           </div>
           <span className="text-[9px] text-os-text3 font-display">{d.day}</span>
         </div>
@@ -30,61 +26,85 @@ function BarChart({ data }: { data: { day: string; h: number }[] }) {
   )
 }
 
-function DonutChart({ data }: { data: { name: string; pct: number; color: string }[] }) {
-  const ref = useRef<HTMLCanvasElement>(null)
-  useEffect(() => {
-    const c = ref.current; if (!c) return
-    const ctx = c.getContext('2d')!
-    const size = 110, cx = size / 2, cy = size / 2, r = size * 0.4
-    let a = -Math.PI / 2
-    ctx.clearRect(0, 0, size, size)
-    data.forEach(d => {
-      const sl = (d.pct / 100) * 2 * Math.PI
-      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, a, a + sl)
-      ctx.closePath(); ctx.fillStyle = d.color; ctx.globalAlpha = 0.88; ctx.fill(); a += sl
-    })
-    ctx.globalAlpha = 1; ctx.beginPath(); ctx.arc(cx, cy, r * 0.56, 0, 2 * Math.PI)
-    ctx.fillStyle = '#14141E'; ctx.fill()
-  }, [data])
-  return <canvas ref={ref} width={110} height={110} />
+function EmptyState({ icon, title, desc, onAction, action }: {
+  icon: string; title: string; desc: string; action?: string; onAction?: () => void
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center py-10 text-center">
+      <div className="text-4xl mb-3">{icon}</div>
+      <div className="font-display font-semibold text-[14px] mb-1">{title}</div>
+      <p className="text-[12px] text-os-text3 mb-3">{desc}</p>
+      {action && onAction && (
+        <Button variant="outline" size="sm" onClick={onAction}>{action}</Button>
+      )}
+    </div>
+  )
 }
 
 export function AnalyticsPage() {
   const tasks = useTasks()
   const habits = useHabits()
   const subjects = useSubjects()
+  const setActivePage = useAppStore(s => s.setActivePage)
+
+  const hasAnyData = tasks.length > 0 || habits.length > 0
 
   const totalDays = habits.reduce((a, h) => a + h.log.filter(Boolean).length, 0)
   const totalPossible = habits.length * 14
 
-  // Dynamic subject breakdown from actual tasks
-  const subjectBreakdown = useMemo(() => {
-    return subjects.map(sub => {
+  const subjectBreakdown = useMemo(() =>
+    subjects.map(sub => {
       const subTasks = tasks.filter(t => t.subjectId === sub.id)
-      const done = subTasks.filter(t => t.done).length
-      return { ...sub, done, total: subTasks.length }
-    }).filter(s => s.total > 0)
-  }, [subjects, tasks])
+      return { ...sub, done: subTasks.filter(t => t.done).length, total: subTasks.length }
+    }).filter(s => s.total > 0),
+    [subjects, tasks]
+  )
 
-  // Dynamic donut data
-  const donutData = useMemo(() => {
-    const total = subjectBreakdown.reduce((a, s) => a + s.total, 0) || 1
-    return subjectBreakdown.map(s => ({
-      name: s.name, pct: Math.round((s.total / total) * 100), color: s.color
-    }))
-  }, [subjectBreakdown])
+  if (!hasAnyData) {
+    return (
+      <PageShell>
+        <h1 className="font-display font-black text-[22px] mb-6">Analytics</h1>
+        <Card>
+          <EmptyState
+            icon="▲"
+            title="No data yet"
+            desc="Start adding tasks and habits to see your analytics here"
+            action="Add Tasks"
+            onAction={() => setActivePage('tasks')}
+          />
+        </Card>
+      </PageShell>
+    )
+  }
 
   return (
     <PageShell>
       <h1 className="font-display font-black text-[22px] mb-6">Analytics</h1>
 
+      {/* Real stats only */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         {[
-          { val: `${tasks.filter(t => t.done).length}/${tasks.length}`, label: 'Tasks Done',   sub: 'total',          color: '#A78BFA' },
-          { val: '31.5h',                                               label: 'Study / Week', sub: '↑8% vs prev',    color: '#67E8F9' },
-          { val: totalPossible > 0 ? `${Math.round(totalDays / totalPossible * 100)}%` : '—',
-            label: 'Habit Rate', sub: 'last 14 days', color: '#FCD34D' },
-          { val: '87', label: 'Focus Score', sub: 'productivity', color: '#6EE7B7' },
+          {
+            val: tasks.length > 0 ? `${tasks.filter(t=>t.done).length}/${tasks.length}` : '—',
+            label: 'Tasks Done', sub: 'total',
+            color: '#A78BFA',
+          },
+          {
+            val: habits.length > 0 && totalPossible > 0
+              ? `${Math.round(totalDays/totalPossible*100)}%` : '—',
+            label: 'Habit Rate', sub: 'last 14 days',
+            color: '#FCD34D',
+          },
+          {
+            val: subjects.length > 0 ? subjects.length : '—',
+            label: 'Subjects', sub: 'being tracked',
+            color: '#67E8F9',
+          },
+          {
+            val: habits.length > 0 ? Math.max(...habits.map(h=>h.streak)) : '—',
+            label: 'Best Streak', sub: 'days in a row',
+            color: '#6EE7B7',
+          },
         ].map((s, i) => (
           <Card key={i} className="text-center">
             <div className="font-display font-black text-[26px]" style={{ color: s.color }}>{s.val}</div>
@@ -95,15 +115,11 @@ export function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <Card>
-          <CardHeader><CardTitle>Weekly Study Hours</CardTitle></CardHeader>
-          <BarChart data={STUDY_DATA} />
-        </Card>
-
+        {/* Tasks by subject */}
         <Card>
           <CardHeader><CardTitle>Tasks by Subject</CardTitle></CardHeader>
           {subjectBreakdown.length === 0 ? (
-            <p className="text-os-text3 text-[13px]">No tasks yet.</p>
+            <EmptyState icon="📊" title="No subject data" desc="Assign subjects to tasks to see this chart" />
           ) : (
             <div className="flex flex-col gap-3">
               {subjectBreakdown.map(s => (
@@ -127,49 +143,52 @@ export function AnalyticsPage() {
           )}
         </Card>
 
-        <Card className="lg:col-span-2">
-          <CardHeader><CardTitle>Habit Activity (Last 14 Days)</CardTitle></CardHeader>
-          {habits.length === 0 && <p className="text-os-text3 text-[13px]">No habits tracked yet.</p>}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {habits.map(h => (
-              <div key={h.id}>
-                <div className="flex justify-between mb-2">
-                  <span className="text-[13px]">{h.name}</span>
-                  <span className="text-[12px] text-amber-300 font-display font-bold">{h.streak}🔥</span>
-                </div>
-                <div className="flex gap-1">
-                  {h.log.map((v, i) => (
-                    <div key={i} className="flex-1 h-3.5 rounded-[3px] border"
-                      style={{
-                        background: v ? `rgba(124,58,237,${0.3 + (i / 28) * 0.7})` : '#1A1A26',
-                        borderColor: v ? 'rgba(124,58,237,0.35)' : '#252535',
-                      }} />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
+        {/* Habit activity */}
         <Card>
-          <CardHeader><CardTitle>Subject Distribution</CardTitle></CardHeader>
-          {donutData.length > 0 ? (
-            <div className="flex items-center gap-5 justify-center">
-              <DonutChart data={donutData} />
-              <div className="flex flex-col gap-2">
-                {donutData.map((s, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-[2px] shrink-0" style={{ background: s.color }} />
-                    <span className="text-[12px] text-os-text2 flex-1">{s.name}</span>
-                    <span className="text-[12px] font-display font-bold" style={{ color: s.color }}>{s.pct}%</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <CardHeader><CardTitle>Habit Activity</CardTitle></CardHeader>
+          {habits.length === 0 ? (
+            <EmptyState icon="◈" title="No habits yet" desc="Add habits to track your daily consistency"
+              action="Add Habit" onAction={() => setActivePage('habits')} />
           ) : (
-            <p className="text-os-text3 text-[13px] text-center py-4">Add tasks to see distribution</p>
+            <div className="flex flex-col gap-4">
+              {habits.slice(0, 4).map(h => (
+                <div key={h.id}>
+                  <div className="flex justify-between mb-1.5">
+                    <span className="text-[13px]">{h.name}</span>
+                    <span className="text-[12px] text-amber-300 font-display font-bold">{h.streak}🔥</span>
+                  </div>
+                  <div className="flex gap-0.5">
+                    {h.log.map((v, i) => (
+                      <div key={i} className="flex-1 h-3 rounded-[2px]"
+                        style={{
+                          background: v ? `rgba(124,58,237,${0.3+(i/28)*0.7})` : '#1A1A26',
+                        }} />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </Card>
+
+        {/* Task completion overall */}
+        {tasks.length > 0 && (
+          <Card className="lg:col-span-2">
+            <CardHeader><CardTitle>Task Overview</CardTitle></CardHeader>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              {[
+                { val: tasks.filter(t=>t.col==='todo').length, label: 'To Do', color: '#7C3AED' },
+                { val: tasks.filter(t=>t.col==='inprogress').length, label: 'In Progress', color: '#F59E0B' },
+                { val: tasks.filter(t=>t.col==='done').length, label: 'Done', color: '#10B981' },
+              ].map((s, i) => (
+                <div key={i} className="p-4 rounded-xl bg-os-bg4 border border-os-border">
+                  <div className="font-display font-black text-[28px]" style={{ color: s.color }}>{s.val}</div>
+                  <div className="text-[13px] text-os-text2 mt-0.5">{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
       </div>
     </PageShell>
   )

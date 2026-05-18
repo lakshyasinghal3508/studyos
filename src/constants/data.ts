@@ -1,4 +1,4 @@
-// src/constants/data.ts — fully dynamic, no hardcoded subject arrays
+// src/constants/data.ts — Zero hardcoded subjects, zero fake data
 
 export type Priority = 'high' | 'medium' | 'low'
 export type KanbanColumn = 'todo' | 'inprogress' | 'done'
@@ -6,7 +6,7 @@ export type PageId =
   | 'dashboard' | 'tasks' | 'ai' | 'notes'
   | 'habits' | 'planner' | 'analytics' | 'settings'
 
-// ─── Dynamic Subject Model ───────────────────────────────────
+// ─── Subject model ────────────────────────────────────────────
 export interface Subject {
   id: string
   name: string
@@ -18,7 +18,7 @@ export interface Subject {
 export interface Task {
   id: string
   title: string
-  subjectId: string   // references Subject.id
+  subjectId: string
   priority: Priority
   due: string
   done: boolean
@@ -42,21 +42,11 @@ export interface Note {
   updated: string
 }
 
-export interface NavItem {
-  id: PageId
-  icon: string
-  label: string
-}
-
-export interface PomodoroPreset {
-  label: string
-  work: number
-  rest: number
-}
-
+export interface NavItem { id: PageId; icon: string; label: string }
+export interface PomodoroPreset { label: string; work: number; rest: number }
 export interface StudyDataPoint { day: string; h: number }
 
-// ─── Navigation ─────────────────────────────────────────────
+// ─── Nav ─────────────────────────────────────────────────────
 export const NAV_ITEMS: NavItem[] = [
   { id: 'dashboard', icon: '⊞', label: 'Dashboard' },
   { id: 'tasks',     icon: '✓', label: 'Tasks' },
@@ -87,73 +77,36 @@ export const POMODORO_PRESETS: PomodoroPreset[] = [
 ]
 
 export const ACCENT_COLORS = [
-  { value: '#7C3AED', name: 'Violet' },
-  { value: '#06B6D4', name: 'Cyan'   },
-  { value: '#F59E0B', name: 'Amber'  },
-  { value: '#10B981', name: 'Emerald'},
-  { value: '#EC4899', name: 'Pink'   },
-  { value: '#EF4444', name: 'Red'    },
+  { value: '#7C3AED', name: 'Violet'  },
+  { value: '#06B6D4', name: 'Cyan'    },
+  { value: '#F59E0B', name: 'Amber'   },
+  { value: '#10B981', name: 'Emerald' },
+  { value: '#EC4899', name: 'Pink'    },
+  { value: '#EF4444', name: 'Red'     },
 ]
 
-// Subject icon options for picker
-export const SUBJECT_ICONS = ['📚','🔬','🧮','🌍','💼','⚛️','🎨','🎵','💻','🏛️','📐','🧬','🌱','🤖','✍️']
+export const SUBJECT_ICONS = ['📚','🔬','🧮','🌍','💼','⚛️','🎨','🎵','💻','🏛️','📐','🧬','🌱','🤖','✍️','🎯','🧠','📊','⚗️','🏆']
 
-// Palette for new subject color picker
 export const SUBJECT_PALETTE = [
   '#7C3AED','#06B6D4','#F59E0B','#10B981',
   '#EF4444','#EC4899','#8B5CF6','#14B8A6',
   '#F97316','#84CC16','#6366F1','#0EA5E9',
 ]
 
-// ─── Default subjects (used on first run) ───────────────────
-export const DEFAULT_SUBJECTS: Subject[] = [
-  { id: 'sub_cs',       name: 'CS',       color: '#7C3AED', icon: '💻', createdAt: 1 },
-  { id: 'sub_math',     name: 'Math',     color: '#06B6D4', icon: '🧮', createdAt: 2 },
-  { id: 'sub_chem',     name: 'Chemistry',color: '#F59E0B', icon: '🔬', createdAt: 3 },
-  { id: 'sub_history',  name: 'History',  color: '#10B981', icon: '🌍', createdAt: 4 },
-  { id: 'sub_business', name: 'Business', color: '#EF4444', icon: '💼', createdAt: 5 },
-  { id: 'sub_physics',  name: 'Physics',  color: '#EC4899', icon: '⚛️', createdAt: 6 },
-]
-
-// ─── Initial data ────────────────────────────────────────────
-export const INIT_TASKS: Task[] = [
-  { id: '1', title: 'Complete Algorithms Assignment', subjectId: 'sub_cs',       priority: 'high',   due: '2026-05-20', done: false, col: 'todo'      },
-  { id: '2', title: 'Read Chapter 7 — Organic Chem', subjectId: 'sub_chem',     priority: 'medium', due: '2026-05-18', done: false, col: 'inprogress' },
-  { id: '3', title: 'Prepare presentation slides',   subjectId: 'sub_business', priority: 'high',   due: '2026-05-19', done: false, col: 'inprogress' },
-  { id: '4', title: 'Calculus problem set',          subjectId: 'sub_math',     priority: 'low',    due: '2026-05-22', done: true,  col: 'done'       },
-  { id: '5', title: 'Physics lab report',            subjectId: 'sub_physics',  priority: 'medium', due: '2026-05-21', done: false, col: 'todo'       },
-  { id: '6', title: 'History essay draft',           subjectId: 'sub_history',  priority: 'low',    due: '2026-05-25', done: true,  col: 'done'       },
-]
-
-export const INIT_HABITS: Habit[] = [
-  { id: '1', name: 'Morning study session', streak: 12, target: 14, log: [1,1,1,1,1,1,1,1,1,1,1,1,0,0] },
-  { id: '2', name: 'Review flashcards',     streak: 7,  target: 14, log: [1,1,1,1,1,1,1,0,0,0,0,0,0,0] },
-  { id: '3', name: 'Read for 30 mins',      streak: 20, target: 14, log: [1,1,1,1,1,1,1,1,1,1,1,1,1,1] },
-  { id: '4', name: 'Exercise',              streak: 5,  target: 14, log: [1,1,1,1,1,0,0,0,0,0,0,0,0,0] },
-  { id: '5', name: 'No social media 9–5',   streak: 3,  target: 7,  log: [1,1,1,0,0,0,0,0,0,0,0,0,0,0] },
-]
-
-export const INIT_NOTES: Note[] = [
-  {
-    id: '1', subjectId: 'sub_cs', pinned: true, updated: '2026-05-16',
-    title: 'Algorithms — Big-O Summary',
-    content: `## Complexity Cheatsheet\n\n**O(1)** — Constant: hash map lookups\n**O(log n)** — Logarithmic: binary search\n**O(n)** — Linear: single array scan\n**O(n log n)** — Merge sort, Timsort\n**O(n²)** — Bubble sort, naive nested loops\n\n> Always analyze worst-case. Average-case matters too.\n\n## Space Complexity\n- Consider auxiliary space separately\n- In-place algorithms use O(1) extra space`,
-  },
-  {
-    id: '2', subjectId: 'sub_chem', pinned: false, updated: '2026-05-15',
-    title: 'Organic Chemistry — Reactions',
-    content: `## Substitution\n- **SN1**: first-order, racemization\n- **SN2**: second-order, inversion\n\n## Elimination\n- Zaitsev's rule: more substituted alkene preferred\n\n## Addition\n- Markovnikov's rule: H adds to less substituted carbon`,
-  },
-  {
-    id: '3', subjectId: 'sub_math', pinned: true, updated: '2026-05-14',
-    title: 'Calculus — Integration Methods',
-    content: `## Techniques\n\n1. **u-substitution** — reverse chain rule\n2. **Integration by parts**: \`∫udv = uv − ∫vdu\`\n3. **Partial fractions** — rational functions\n\n## Key Formulas\n\`\`\`\n∫sin(x)dx = −cos(x) + C\n∫eˣ dx    =  eˣ + C\n\`\`\``,
-  },
-]
-
-export const STUDY_DATA: StudyDataPoint[] = [
-  { day: 'Mon', h: 4.5 }, { day: 'Tue', h: 3   }, { day: 'Wed', h: 6   },
-  { day: 'Thu', h: 2.5 }, { day: 'Fri', h: 5   }, { day: 'Sat', h: 7   }, { day: 'Sun', h: 3.5 },
+// Suggested subject names for autocomplete — user can type anything freely
+export const SUBJECT_SUGGESTIONS = [
+  'Mathematics','Physics','Chemistry','Biology','Computer Science',
+  'History','Geography','Economics','Business Studies','Accountancy',
+  'English Literature','Hindi','Political Science','Sociology','Psychology',
+  'Machine Learning','Data Science','Web Development','DSA','Algorithms',
+  'UPSC History','UPSC Geography','UPSC Economy','UPSC Polity','UPSC Science',
+  'JEE Physics','JEE Chemistry','JEE Mathematics','NEET Biology',
+  'Graphic Design','UI/UX Design','Photography','Music Theory',
+  'Japanese','French','Spanish','German','Sanskrit',
+  'Fitness','Nutrition','Yoga','Sports Science',
+  'Startup Research','Entrepreneurship','Marketing','Finance','Investing',
+  'Quantum Physics','Organic Chemistry','Linear Algebra','Calculus',
+  'AI Agents','Deep Learning','NLP','Computer Vision','DevOps',
 ]
 
 export const AI_SUGGESTIONS = [
@@ -172,3 +125,10 @@ Your role: Help students with concept explanations, personalized study plans, ex
 Style: Use rich markdown — headers (##), **bold** key terms, bullet lists, \`inline code\`, code blocks. Be encouraging, precise, actionable.
 
 Persona: A brilliant mentor combining professor wisdom with coach energy.`
+
+// ─── NO fake/seeded data — app starts empty ──────────────────
+// Empty arrays = clean user-first experience
+export const INIT_TASKS: Task[] = []
+export const INIT_HABITS: Habit[] = []
+export const INIT_NOTES: Note[] = []
+export const DEFAULT_SUBJECTS: Subject[] = []

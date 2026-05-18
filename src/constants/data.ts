@@ -132,3 +132,13 @@ export const INIT_TASKS: Task[] = []
 export const INIT_HABITS: Habit[] = []
 export const INIT_NOTES: Note[] = []
 export const DEFAULT_SUBJECTS: Subject[] = []
+
+export const SCHEDULE = [
+  { time: '09:00', task: 'Morning Study Session',    subject: null as string | null, dur: '90m' },
+  { time: '10:45', task: 'Break + Review notes',     subject: null,                  dur: '15m' },
+  { time: '11:00', task: 'Deep Work Block',          subject: null,                  dur: '60m' },
+  { time: '12:00', task: 'Lunch break',              subject: null,                  dur: '60m' },
+  { time: '13:00', task: 'Practice Problems',        subject: null,                  dur: '90m' },
+  { time: '14:45', task: 'Reading / Research',       subject: null,                  dur: '60m' },
+  { time: '16:00', task: 'Review & Flashcards',      subject: null,                  dur: '45m' },
+]

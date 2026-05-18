@@ -3,7 +3,6 @@ import { motion } from 'framer-motion'
 import { PageShell } from '@/components/layout/PageShell'
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { SubjectBadge } from '@/components/ui/Badge'
 import { POMODORO_PRESETS, SCHEDULE } from '@/constants/data'
 import { cn } from '@/utils'
 
@@ -72,8 +71,7 @@ export function PlannerPage() {
             ))}
           </div>
           <div className="flex flex-col items-center gap-4">
-            {/* Ring */}
-            <div className="relative w-40 h-40" role="timer" aria-label={`${phase === 'work' ? 'Work' : 'Break'}: ${mm}:${ss}`}>
+            <div className="relative w-40 h-40" role="timer" aria-label={`${phase}: ${mm}:${ss}`}>
               <svg width="160" height="160" viewBox="0 0 160 160" aria-hidden>
                 <circle cx="80" cy="80" r="70" fill="none" stroke="#1A1A26" strokeWidth="6" />
                 <circle cx="80" cy="80" r="70" fill="none" stroke={color} strokeWidth="6"
@@ -101,26 +99,19 @@ export function PlannerPage() {
           </div>
         </Card>
 
-        {/* Exams */}
+        {/* Exam countdown */}
         <Card>
           <CardHeader><CardTitle>Exam Countdown</CardTitle></CardHeader>
           <div className="flex flex-col gap-3">
             {[
-              { name: 'Algorithms',       days: 11, date: '2026-05-28', color: '#7C3AED', pct: 63 },
-              { name: 'Organic Chemistry',days: 17, date: '2026-06-03', color: '#F59E0B', pct: 43 },
-              { name: 'Business Strategy',days: 24, date: '2026-06-10', color: '#06B6D4', pct: 20 },
+              { name: 'Upcoming Exam 1', days: 11, color: '#7C3AED', pct: 63 },
+              { name: 'Upcoming Exam 2', days: 17, color: '#F59E0B', pct: 43 },
+              { name: 'Upcoming Exam 3', days: 24, color: '#06B6D4', pct: 20 },
             ].map((e, i) => (
               <div key={i} className="p-3 rounded-[8px] bg-os-bg4 border border-os-border">
                 <div className="flex justify-between mb-2">
                   <span className="font-display font-medium text-[13px]">{e.name}</span>
                   <span className="font-display font-black text-[22px]" style={{ color: e.color }}>{e.days}d</span>
-                </div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-[11px] text-os-text3">{e.date}</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-display font-semibold"
-                    style={{ background: `${e.color}22`, color: e.color }}>
-                    {e.days < 14 ? '⚠ Soon' : '📅 Upcoming'}
-                  </span>
                 </div>
                 <div className="h-1 rounded-full bg-os-bg5 overflow-hidden">
                   <motion.div initial={{ width: 0 }} animate={{ width: `${e.pct}%` }}
@@ -134,20 +125,18 @@ export function PlannerPage() {
 
         {/* Schedule */}
         <Card className="lg:col-span-2">
-          <CardHeader><CardTitle>Today&apos;s Schedule</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Daily Schedule Template</CardTitle></CardHeader>
           <ol className="space-y-0" aria-label="Daily schedule">
             {SCHEDULE.map((s, i) => (
               <li key={i} className="flex gap-3 items-stretch">
                 <div className="text-[11px] text-os-text3 font-display w-12 pt-2.5 shrink-0">{s.time}</div>
                 <div className="flex flex-col items-center w-4 shrink-0">
-                  <div className="w-2 h-2 rounded-full mt-2.5 shrink-0"
-                    style={{ background: s.subject ? '#7C3AED' : '#2E2E42' }} aria-hidden />
+                  <div className="w-2 h-2 rounded-full mt-2.5 shrink-0 bg-[var(--accent)]" aria-hidden />
                   {i < SCHEDULE.length - 1 && <div className="flex-1 w-px bg-os-border mt-0.5" aria-hidden />}
                 </div>
                 <div className="flex-1 pb-4">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-[13px] font-medium">{s.task}</span>
-                    {s.subject && <SubjectBadge subject={s.subject} />}
                     <span className="ml-auto text-[11px] text-os-text3">{s.dur}</span>
                   </div>
                 </div>

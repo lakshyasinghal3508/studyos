@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 // src/services/api.ts — typed HTTP client
 const BASE = import.meta.env.VITE_API_URL ?? '/api'
 

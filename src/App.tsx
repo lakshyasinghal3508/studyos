@@ -1,4 +1,4 @@
-// App.tsx — System theme auto-detection, no manual theme controls
+// App.tsx — Theme handled by CSS media queries, no JS theme state
 import { Suspense, lazy, useEffect } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { Sidebar } from '@/components/layout/Sidebar'
@@ -7,14 +7,14 @@ import { OnboardingPage } from '@/components/onboarding/OnboardingPage'
 import { useAppStore } from '@/store/useAppStore'
 import { useSystemTheme } from '@/hooks/useSystemTheme'
 
-const DashboardPage  = lazy(() => import('@/components/pages/dashboard/DashboardPage').then(m => ({ default: m.DashboardPage })))
-const TasksPage      = lazy(() => import('@/components/pages/tasks/TasksPage').then(m => ({ default: m.TasksPage })))
-const AIPage         = lazy(() => import('@/components/pages/ai/AIPage').then(m => ({ default: m.AIPage })))
-const NotesPage      = lazy(() => import('@/components/pages/notes/NotesPage').then(m => ({ default: m.NotesPage })))
-const HabitsPage     = lazy(() => import('@/components/pages/habits/HabitsPage').then(m => ({ default: m.HabitsPage })))
-const PlannerPage    = lazy(() => import('@/components/pages/planner/PlannerPage').then(m => ({ default: m.PlannerPage })))
-const AnalyticsPage  = lazy(() => import('@/components/pages/analytics/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })))
-const SettingsPage   = lazy(() => import('@/components/pages/settings/SettingsPage').then(m => ({ default: m.SettingsPage })))
+const DashboardPage = lazy(() => import('@/components/pages/dashboard/DashboardPage').then(m => ({ default: m.DashboardPage })))
+const TasksPage     = lazy(() => import('@/components/pages/tasks/TasksPage').then(m => ({ default: m.TasksPage })))
+const AIPage        = lazy(() => import('@/components/pages/ai/AIPage').then(m => ({ default: m.AIPage })))
+const NotesPage     = lazy(() => import('@/components/pages/notes/NotesPage').then(m => ({ default: m.NotesPage })))
+const HabitsPage    = lazy(() => import('@/components/pages/habits/HabitsPage').then(m => ({ default: m.HabitsPage })))
+const PlannerPage   = lazy(() => import('@/components/pages/planner/PlannerPage').then(m => ({ default: m.PlannerPage })))
+const AnalyticsPage = lazy(() => import('@/components/pages/analytics/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })))
+const SettingsPage  = lazy(() => import('@/components/pages/settings/SettingsPage').then(m => ({ default: m.SettingsPage })))
 
 const PAGES = {
   dashboard: DashboardPage, tasks: TasksPage, ai: AIPage, notes: NotesPage,
@@ -26,7 +26,7 @@ function Fallback() {
 }
 
 export default function App() {
-  // Auto system theme — replaces manual dark/light toggle
+  // Syncs data-theme attr for JS usage — actual theme is CSS @media
   useSystemTheme()
 
   const { activePage, onboardingComplete } = useAppStore(s => ({
@@ -37,6 +37,7 @@ export default function App() {
   // Fixed accent color
   useEffect(() => {
     document.documentElement.style.setProperty('--accent', '#7C3AED')
+    document.documentElement.style.setProperty('--accent2', '#06B6D4')
   }, [])
 
   if (!onboardingComplete) return <OnboardingPage />
@@ -44,11 +45,10 @@ export default function App() {
   const ActivePage = PAGES[activePage]
 
   return (
-    <div className="flex h-screen overflow-hidden bg-os-bg">
+    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--bg)' }}>
       <Sidebar />
       <main id="main-content" tabIndex={-1}
-        className="flex-1 overflow-y-auto p-7 min-w-0 md:pt-7 pt-16"
-        aria-label="Main content">
+        className="flex-1 overflow-y-auto p-7 min-w-0 md:pt-7 pt-16">
         <AnimatePresence mode="wait">
           <Suspense fallback={<Fallback />}>
             <ActivePage key={activePage} />

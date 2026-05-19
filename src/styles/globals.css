@@ -2,147 +2,110 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Google Fonts import (fallback for offline builds) ── */
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* ── CSS custom properties (design system) ─────────────── */
+/* ── CSS variables — DARK mode (default) ────────────────── */
 :root {
   --accent: #7C3AED;
   --accent2: #06B6D4;
-  --accent3: #F59E0B;
-
-  /* Scrollbar */
-  --sb-w: 4px;
-  --sb-track: transparent;
+  --bg: #08080E;
+  --bg2: #0F0F17;
+  --bg3: #14141E;
+  --bg4: #1A1A26;
+  --bg5: #20202E;
+  --border: #252535;
+  --border2: #2E2E42;
+  --text: #EEEDF8;
+  --text2: #9896B6;
+  --text3: #54527A;
   --sb-thumb: #2E2E42;
 }
 
-/* ── Base resets ────────────────────────────────────────── */
+/* ── CSS variables — LIGHT mode (auto from OS) ───────────── */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg:      #F8F8FC;
+    --bg2:     #F0F0F6;
+    --bg3:     #FFFFFF;
+    --bg4:     #EEEEF8;
+    --bg5:     #E4E4F0;
+    --border:  #DDDDE8;
+    --border2: #CCCCDC;
+    --text:    #1A1A2E;
+    --text2:   #5C5A78;
+    --text3:   #9896B6;
+    --sb-thumb:#CCCCDC;
+  }
+}
+
+/* ── Base ────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
-
-html, body, #root {
-  height: 100%;
-  overflow: hidden;
+html, body, #root { height: 100%; overflow: hidden; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* ── Custom scrollbar ───────────────────────────────────── */
-::-webkit-scrollbar { width: var(--sb-w); height: var(--sb-w); }
-::-webkit-scrollbar-track { background: var(--sb-track); }
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--sb-thumb); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #3A3A52; }
 
-/* ── Focus ring ─────────────────────────────────────────── */
-:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  border-radius: 6px;
-}
+/* ── Focus ───────────────────────────────────────────────── */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+::selection { background: rgba(124,58,237,0.3); color: var(--text); }
 
-/* ── Selection ──────────────────────────────────────────── */
-::selection {
-  background: rgba(124, 58, 237, 0.3);
-  color: #EEEDF8;
-}
+/* ── Animations ──────────────────────────────────────────── */
+@keyframes fadeUp    { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn    { from{opacity:0} to{opacity:1} }
+@keyframes glow      { 0%,100%{box-shadow:0 0 20px rgba(124,58,237,.2)} 50%{box-shadow:0 0 50px rgba(124,58,237,.5)} }
+@keyframes float     { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+@keyframes shimmer   { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+@keyframes typing    { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes scaleIn   { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+@keyframes pulse     { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-/* ── Animations ─────────────────────────────────────────── */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-@keyframes slideInLeft {
-  from { opacity: 0; transform: translateX(-8px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes glow {
-  0%,100% { box-shadow: 0 0 20px rgba(124,58,237,0.2); }
-  50%     { box-shadow: 0 0 50px rgba(124,58,237,0.5); }
-}
-@keyframes float {
-  0%,100% { transform: translateY(0); }
-  50%     { transform: translateY(-6px); }
-}
-@keyframes shimmer {
-  0%   { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
-}
-@keyframes typing {
-  0%,100% { opacity: 1; }
-  50%     { opacity: 0; }
-}
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
-}
-@keyframes progressFill {
-  from { width: 0; }
-}
+.animate-fade-up  { animation: fadeUp .35s ease both; }
+.animate-fade-in  { animation: fadeIn .2s ease both; }
+.animate-glow     { animation: glow 3s ease infinite; }
+.animate-float    { animation: float 3s ease infinite; }
+.animate-scale-in { animation: scaleIn .2s ease both; }
 
-.animate-fade-up    { animation: fadeUp 0.35s ease both; }
-.animate-fade-in    { animation: fadeIn 0.2s ease both; }
-.animate-slide-in   { animation: slideInLeft 0.25s ease both; }
-.animate-glow       { animation: glow 3s ease infinite; }
-.animate-float      { animation: float 3s ease infinite; }
-.animate-scale-in   { animation: scaleIn 0.2s ease both; }
-.animate-progress   { animation: progressFill 1s ease both; }
-
-/* ── Skeleton shimmer ───────────────────────────────────── */
+/* ── Skeleton ────────────────────────────────────────────── */
 .skeleton {
-  background: linear-gradient(90deg, #1A1A26 25%, #20202E 50%, #1A1A26 75%);
+  background: linear-gradient(90deg, var(--bg4) 25%, var(--bg5) 50%, var(--bg4) 75%);
   background-size: 400px 100%;
   animation: shimmer 1.5s infinite;
 }
 
-/* ── Typing cursor ──────────────────────────────────────── */
+/* ── Typing cursor ───────────────────────────────────────── */
 .typing-cursor {
-  display: inline-block;
-  width: 2px;
-  height: 1em;
-  background: var(--accent);
-  vertical-align: -2px;
-  margin-left: 2px;
-  animation: typing 1s step-end infinite;
+  display: inline-block; width: 2px; height: 1em;
+  background: var(--accent); vertical-align: -2px;
+  margin-left: 2px; animation: typing 1s step-end infinite;
 }
 
-/* ── Markdown prose override ────────────────────────────── */
-.md-content h1, .md-content h2 { font-family: 'Syne', sans-serif; font-weight: 700; }
+/* ── Markdown ────────────────────────────────────────────── */
+.md-content h1, .md-content h2 { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--text); }
 .md-content code { background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.2); color: #A78BFA; border-radius: 4px; padding: 1px 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.85em; }
-.md-content pre { background: #0F0F17; border: 1px solid #252535; border-radius: 10px; }
-.md-content pre code { background: none; border: none; color: #E2E8F0; }
-.md-content blockquote { border-left: 3px solid var(--accent); background: rgba(124,58,237,0.06); }
-.md-content a { color: #06B6D4; }
+.md-content pre { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; }
+.md-content pre code { background: none; border: none; color: var(--text); }
+.md-content blockquote { border-left: 3px solid var(--accent); background: rgba(124,58,237,0.06); padding: 0.4rem 0.75rem; }
+.md-content a { color: var(--accent2); }
+.md-content p, .md-content li { color: var(--text2); }
+.md-content strong { color: var(--text); }
 
-/* ── Noise texture overlay ──────────────────────────────── */
-.noise-overlay::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+/* ── Tailwind dark: overrides for light mode (via media) ── */
+@media (prefers-color-scheme: light) {
+  .bg-os-bg  { background-color: #F8F8FC !important; }
+  .bg-os-bg2 { background-color: #F0F0F6 !important; }
+  .bg-os-bg3 { background-color: #FFFFFF !important; }
+  .bg-os-bg4 { background-color: #EEEEF8 !important; }
+  .border-os-border  { border-color: #DDDDE8 !important; }
+  .border-os-border2 { border-color: #CCCCDC !important; }
+  .text-os-text  { color: #1A1A2E !important; }
+  .text-os-text2 { color: #5C5A78 !important; }
+  .text-os-text3 { color: #9896B6 !important; }
 }
-
-/* ── Gradient mesh bg ───────────────────────────────────── */
-.mesh-bg {
-  background:
-    radial-gradient(at 20% 20%, rgba(124,58,237,0.06) 0, transparent 50%),
-    radial-gradient(at 80% 80%, rgba(6,182,212,0.04) 0, transparent 50%),
-    radial-gradient(at 60% 10%, rgba(236,72,153,0.03) 0, transparent 40%);
-}
-
-/* ── Glass card ─────────────────────────────────────────── */
-.glass {
-  background: rgba(20, 20, 30, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.06);
-}
-
-/* ── Accent dynamic var ─────────────────────────────────── */
-.accent-bg { background: var(--accent); }
-.accent-text { color: var(--accent); }
-.accent-border { border-color: var(--accent); }

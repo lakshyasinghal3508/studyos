@@ -328,6 +328,19 @@ export function OnboardingPage() {
       if (!validateAccount()) return
       setLoading(true)
       try {
+        // Check if email already registered
+        const existing = getStoredAuth()
+        if (existing && existing.email.toLowerCase() === profile.email.toLowerCase()) {
+          setPassError('This email is already registered. Please sign in instead.')
+          setLoading(false)
+          return
+        }
+        // Check if mobile already registered
+        if (existing && existing.mobile && existing.mobile === profile.mobile) {
+          setPassError('This mobile number is already registered. Please sign in instead.')
+          setLoading(false)
+          return
+        }
         const hash = await hashPassword(password)
         saveAuth({
           name: profile.name, email: profile.email,

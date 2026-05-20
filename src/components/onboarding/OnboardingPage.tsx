@@ -6,6 +6,7 @@ import { useAppStore } from '@/store/useAppStore'
 import { Subject, SUBJECT_SUGGESTIONS, SUBJECT_ICONS, SUBJECT_PALETTE } from '@/constants/data'
 import { generateId, cn } from '@/utils'
 import toast from 'react-hot-toast'
+import { trackRegister, trackLogin } from '@/supabase'
 
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder()
@@ -207,6 +208,8 @@ function LoginScreen({ onLogin, onNewAccount }: {
       if (auth.email.toLowerCase() !== email.toLowerCase()) { setError('Email not found.'); setLoading(false); return }
       if (auth.passwordHash !== hash) { setError('Wrong password. Please try again.'); setLoading(false); return }
       toast.success(`Welcome back, ${auth.name}! 👋`)
+      // Track login
+await trackLogin(email)
       onLogin(auth.name, auth.email, auth.mobile)
     } catch { setError('Login failed. Try again.') }
     setLoading(false)
@@ -330,6 +333,13 @@ export function OnboardingPage() {
           mobile: profile.mobile, dob: profile.dob, passwordHash: hash,
         })
         toast.success('Account created! 🎉')
+        // Track registration
+await trackRegister({
+  name: profile.name,
+  email: profile.email,
+  mobile: profile.mobile,
+  device: navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop',
+})
         setStep(2)
       } catch { toast.error('Something went wrong') }
       setLoading(false)

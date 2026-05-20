@@ -316,6 +316,7 @@ export function OnboardingPage() {
   const validateAccount = () => {
     if (!profile.name.trim()) { setPassError('Name is required'); return false }
     if (!profile.email.includes('@')) { setPassError('Enter valid email'); return false }
+    if (!profile.mobile || profile.mobile.length !== 10) { setPassError('Enter valid 10-digit mobile number'); return false }
     if (!profile.dob) { setPassError('Date of birth is required'); return false }
     if (password.length < 6) { setPassError('Password must be at least 6 characters'); return false }
     if (password !== confirmPassword) { setPassError('Passwords do not match'); return false }
@@ -354,7 +355,7 @@ await trackRegister({
 
   const canNext =
     step === 0 ? true :
-    step === 1 ? !!(profile.name.trim() && profile.email.includes('@') && profile.dob && password.length >= 6 && confirmPassword === password) :
+    step === 1 ? !!(profile.name.trim() && profile.email.includes('@') && profile.mobile.length === 10 && profile.dob && password.length >= 6 && confirmPassword === password) :
     true
 
   if (showLogin) return <LoginScreen onLogin={handleLogin} onNewAccount={() => setShowLogin(false)} />
@@ -424,8 +425,8 @@ await trackRegister({
                   <Input id="ob-email" type="email" placeholder="you@example.com" value={profile.email}
                     onChange={e => set('email')(e.target.value)} />
                 </FormGroup>
-                <FormGroup label="Mobile Number" htmlFor="ob-mobile">
-                  <Input id="ob-mobile" type="tel" placeholder="10-digit (optional)" value={profile.mobile}
+                <FormGroup label="Mobile Number *" htmlFor="ob-mobile">
+                  <Input id="ob-mobile" type="tel" placeholder="10-digit mobile number" value={profile.mobile}
                     onChange={e => set('mobile')(e.target.value.replace(/\D/g,'').slice(0,10))} />
                 </FormGroup>
                 <FormGroup label="Date of Birth * (for password recovery)" htmlFor="ob-dob">

@@ -6,7 +6,7 @@ import { SafeMarkdown } from '@/components/ui/SafeMarkdown'
 import { useAppStore, useChat, useSubjects } from '@/store/useAppStore'
 import { AI_SUGGESTIONS, AI_SYSTEM_PROMPT } from '@/constants/data'
 
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
 
 async function callGemini(messages: {role:string;content:string}[], system: string, apiKey: string): Promise<string> {
   const contents = messages.map(m => ({
